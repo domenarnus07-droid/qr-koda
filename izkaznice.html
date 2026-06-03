@@ -5,307 +5,232 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elektro Novateh – Izkaznice</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background:
-        radial-gradient(ellipse at 60% 0%, #1e0606 0%, #080808 55%),
-        #060606;
+      background: radial-gradient(ellipse at 60% 0%, #1e0606 0%, #080808 55%), #060606;
       color: #f0f0f0;
       font-family: Inter, 'Segoe UI', Arial, sans-serif;
-      padding: 36px 16px 52px;
+      padding: 36px 16px 60px;
     }
 
-    /* ── Screen UI ── */
+    /* ══════════════════════════════════════
+       SCREEN UI PANEL
+    ══════════════════════════════════════ */
     .ui {
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto 40px;
-      background:
-        linear-gradient(155deg, #1d0909 0%, #0d0d0d 100%) padding-box,
-        linear-gradient(135deg, #ff4444 0%, #cc0000 45%, #660000 100%) border-box;
+      background: linear-gradient(155deg, #1d0909 0%, #0d0d0d 100%) padding-box,
+                  linear-gradient(135deg, #ff4444 0%, #cc0000 45%, #660000 100%) border-box;
       border: 1px solid transparent;
       border-radius: 20px;
-      padding: 30px 28px 26px;
-      box-shadow:
-        0 28px 80px rgba(0,0,0,0.65),
-        0 0 0 1px rgba(255,255,255,0.03) inset,
-        0 0 40px rgba(180,0,0,0.12);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 18px;
-      text-align: center;
+      padding: 28px 26px 24px;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.65), 0 0 40px rgba(180,0,0,0.10);
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
     }
 
-    .ui-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .ui-logo { width: 52px; height: 52px; flex-shrink: 0; }
-    .ui-brand { text-align: left; }
-    .ui-brand .ui-name { font-size: 1.35rem; font-weight: 800; color: #fff; letter-spacing: 0.01em; line-height: 1.1; }
-    .ui-brand .ui-sub  { font-size: 0.7rem; font-weight: 700; color: #cc0000; letter-spacing: 0.2em; text-transform: uppercase; }
+    .ui-header { display: flex; align-items: center; gap: 14px; }
+    .ui-logo   { width: 50px; height: 50px; flex-shrink: 0; }
+    .ui-name   { font-size: 1.3rem; font-weight: 800; color: #fff; line-height: 1.1; }
+    .ui-sub    { font-size: 0.68rem; font-weight: 700; color: #cc0000; letter-spacing: 0.22em; text-transform: uppercase; }
 
-    .ui-divider {
-      width: 85%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(204,0,0,0.35), transparent);
+    .ui-hr { width: 90%; height: 1px; background: linear-gradient(90deg, transparent, rgba(204,0,0,0.35), transparent); }
+
+    /* Section label */
+    .sec-label {
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #555; text-align: left; width: 100%;
     }
 
-    .ui-tagline {
-      font-size: 0.75rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #555;
+    /* Chip group (QR mode, theme) */
+    .chip-group { display: flex; gap: 6px; width: 100%; }
+    .chip {
+      flex: 1; padding: 9px 6px; border: 1px solid #333;
+      border-radius: 8px; background: #141414; color: #888;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      transition: all .15s; text-align: center;
     }
+    .chip:hover { border-color: #cc0000; color: #ddd; }
+    .chip.active { background: #cc0000; border-color: #cc0000; color: #fff; box-shadow: 0 3px 14px rgba(204,0,0,0.35); }
 
+    /* Tip box */
     .tip {
-      background: rgba(180,0,0,0.06);
-      border: 1px solid rgba(204,0,0,0.16);
-      border-left: 3px solid #cc0000;
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 0.81rem;
-      color: #aa7070;
-      width: 100%;
-      text-align: left;
-      line-height: 1.75;
+      background: rgba(180,0,0,0.06); border: 1px solid rgba(204,0,0,0.16);
+      border-left: 3px solid #cc0000; border-radius: 10px;
+      padding: 10px 14px; font-size: 0.79rem; color: #aa7070;
+      width: 100%; text-align: left; line-height: 1.75;
     }
     .tip strong { color: #ff5555; }
     .tip code {
-      background: rgba(255,255,255,0.07);
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.84em;
-      color: #ffaaaa;
+      background: rgba(255,255,255,0.07); padding: 1px 5px; border-radius: 4px;
+      font-family: monospace; font-size: 0.84em; color: #ffaaaa;
     }
 
-    .url-section { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-    .url-label { font-size: 0.73rem; color: #555; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; }
-    .url-row { display: flex; gap: 8px; width: 100%; }
-    .url-row input {
-      flex: 1;
-      padding: 11px 14px;
-      border: 1px solid rgba(204,0,0,0.2);
-      border-radius: 10px;
-      background: rgba(0,0,0,0.45);
-      color: #f0f0f0;
-      font-size: 0.88rem;
-      font-family: monospace;
-      transition: border-color .15s, box-shadow .15s;
+    /* IP picker */
+    .ip-list { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; margin-top: 4px; }
+    .ip-chip {
+      padding: 5px 11px; border: 1px solid #444; border-radius: 7px;
+      background: #1a1a1a; color: #ccc; font-size: 0.78rem; font-family: monospace;
+      cursor: pointer; transition: all .15s;
     }
-    .url-row input:focus {
-      outline: none;
-      border-color: #cc0000;
-      box-shadow: 0 0 0 3px rgba(204,0,0,0.14);
+    .ip-chip:hover { border-color: #cc0000; color: #fff; background: rgba(204,0,0,0.15); }
+    .ip-chip.active { border-color: #cc0000; background: rgba(204,0,0,0.25); color: #fff; }
+
+    /* Input rows */
+    .field { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+    .field-row { display: flex; gap: 7px; width: 100%; }
+    .field input {
+      flex: 1; padding: 10px 13px; border: 1px solid rgba(204,0,0,0.2);
+      border-radius: 9px; background: rgba(0,0,0,0.45); color: #f0f0f0;
+      font-size: 0.87rem; font-family: monospace; transition: border-color .15s, box-shadow .15s;
     }
-    .btn-row { display: flex; gap: 8px; width: 100%; }
+    .field input:focus { outline: none; border-color: #cc0000; box-shadow: 0 0 0 3px rgba(204,0,0,0.14); }
+    .field input::placeholder { color: #444; }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 7px; width: 100%; flex-wrap: wrap; }
     .btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .18s;
-      white-space: nowrap;
+      flex: 1; min-width: 80px; padding: 11px 10px;
+      border: none; border-radius: 9px; font-size: 0.86rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; white-space: nowrap; text-align: center;
     }
     .btn:active { transform: scale(0.97); }
-    .btn-red {
-      background: linear-gradient(135deg, #e00000 0%, #8f0000 100%);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(204,0,0,0.35);
-    }
-    .btn-red:hover { box-shadow: 0 6px 28px rgba(204,0,0,0.55); transform: translateY(-1px); }
-    .btn-dark { background: #161616; color: #bbb; border: 1px solid #2e2e2e; }
-    .btn-dark:hover { background: #1e1e1e; }
+    .btn-red  { background: linear-gradient(135deg,#e00000,#8f0000); color:#fff; box-shadow:0 4px 16px rgba(204,0,0,0.3); }
+    .btn-red:hover  { box-shadow:0 6px 24px rgba(204,0,0,0.5); transform:translateY(-1px); }
+    .btn-dark { background:#161616; color:#bbb; border:1px solid #2e2e2e; }
+    .btn-dark:hover { background:#1e1e1e; }
+    .btn-green { background:linear-gradient(135deg,#1a5c1a,#0d3d0d); color:#7dff7d; border:1px solid #2a6e2a; }
+    .btn-green:hover { box-shadow:0 4px 16px rgba(0,180,0,0.2); transform:translateY(-1px); }
+    .btn-blue { background:linear-gradient(135deg,#1a3a6e,#0d2045); color:#88aaff; border:1px solid #2a4a8e; }
+    .btn-blue:hover { box-shadow:0 4px 16px rgba(0,80,200,0.2); transform:translateY(-1px); }
+    .btn:disabled { opacity:.5; cursor:wait; transform:none !important; }
 
-    /* ── A4 sheet: 2 × 5 = 10 cards, 85×54mm ── */
+    /* Checkbox row */
+    .check-row {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%; cursor: pointer; user-select: none;
+    }
+    .check-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #cc0000; cursor: pointer; }
+    .check-row span { font-size: 0.82rem; color: #888; }
+
+    /* ══════════════════════════════════════
+       A4 SHEET
+    ══════════════════════════════════════ */
     .sheet {
-      width: 210mm;
-      min-height: 297mm;
-      margin: 0 auto;
+      width: 210mm; min-height: 297mm; margin: 0 auto;
       background: #c6c6c6;
-      padding: 7mm 17mm;
       display: grid;
-      grid-template-columns: repeat(2, 85mm);
-      grid-template-rows: repeat(5, 54mm);
       gap: 3mm;
-      justify-content: center;
+      justify-content: center; align-content: start;
     }
+    .sheet.normal  { padding: 7mm 17mm; grid-template-columns: repeat(2,85mm); grid-auto-rows: 54mm; }
+    /* Bleed: card size sama, slot ima +6mm prostor za oznake, overflow:hidden skrije del oznak */
+    .sheet.bleed   { padding: 10mm 14mm; grid-template-columns: repeat(2,85mm); grid-auto-rows: 54mm; gap: 9mm; }
 
-    /* ── Card ── */
+    /* ══════════════════════════════════════
+       CARD SLOT (bleed wrapper)
+    ══════════════════════════════════════ */
+    .card-slot { position: relative; width: 100%; height: 100%; }
+
+    /* Crop marks – inline-styled SVG, no class needed */
+
+    /* ══════════════════════════════════════
+       DARK CARD
+    ══════════════════════════════════════ */
     .card {
-      width: 85mm;
-      height: 54mm;
-      border-radius: 0;
-      overflow: hidden;
-      display: flex;
-      flex-direction: row;
-      position: relative;
-      background: linear-gradient(145deg, #240b0b 0%, #100808 38%, #060606 100%);
+      width: 100%; height: 100%;
+      border-radius: 0; overflow: hidden;
+      display: flex; flex-direction: row; position: relative;
+      background: linear-gradient(160deg,#1a0505 0%,#0c0808 45%,#050505 100%);
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
-
-    /* Full-card SVG background layer */
-    .card-bg {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .card-bg svg { width: 100%; height: 100%; }
-
-    /* Left red gradient bar */
+    .card-bg { position:absolute; inset:0; pointer-events:none; z-index:0; }
+    .card-bg svg { width:100%; height:100%; }
     .card-bar {
-      width: 3mm;
-      flex-shrink: 0;
-      background: linear-gradient(180deg, #ff4444 0%, #cc0000 50%, #8f0000 100%);
-      position: relative; z-index: 1;
+      width: 3mm; flex-shrink: 0; z-index: 1; position: relative;
+      background: linear-gradient(180deg,#ff4444 0%,#cc0000 50%,#8f0000 100%);
     }
-
-    /* Inner content */
     .card-inner {
-      flex: 1;
-      padding: 3mm 3.5mm 3mm 3.5mm;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
+      flex: 1; padding: 3mm 3.5mm 3mm 3.5mm;
+      display: flex; flex-direction: column; min-width: 0;
       position: relative; z-index: 1;
     }
+    .brand-row { display:flex; align-items:center; gap:2.5mm; flex-shrink:0; }
+    .logo-wrap { width:12mm; height:12mm; flex-shrink:0; }
+    .brand-text .name { font-size:5.1mm; font-weight:800; color:#fff; letter-spacing:0.01em; line-height:1.1; }
+    .brand-text .sub  { font-size:3.2mm; font-weight:700; color:#cc0000; letter-spacing:0.15em; text-transform:uppercase; line-height:1.2; }
+    .emp-name { font-size:2.7mm; font-weight:500; font-style:italic; color:rgba(255,255,255,0.6); margin-top:1mm; line-height:1; }
 
-    /* Brand row */
-    .brand-row {
-      display: flex;
-      align-items: center;
-      gap: 2.5mm;
-      flex-shrink: 0;
-    }
-    .logo-wrap { width: 12mm; height: 12mm; flex-shrink: 0; }
-    .brand-text .name {
-      font-size: 5.1mm; font-weight: 800;
-      color: #ffffff; letter-spacing: 0.01em; line-height: 1.1;
-    }
-    .brand-text .sub {
-      font-size: 3.2mm; font-weight: 700;
-      color: #cc0000; letter-spacing: 0.15em; text-transform: uppercase; line-height: 1.2;
-    }
+    .divider { height:0.4mm; background:linear-gradient(90deg,#cc0000 65%,transparent); border-radius:1mm; margin:2mm 0; flex-shrink:0; }
 
-    /* Divider */
-    .divider {
-      height: 0.4mm;
-      background: linear-gradient(90deg, #cc0000 65%, transparent);
-      border-radius: 1mm;
-      margin: 2mm 0 2mm;
-      flex-shrink: 0;
-    }
+    .card-bottom { flex:1; display:flex; flex-direction:row; align-items:flex-start; gap:3mm; min-height:0; }
+    .contacts    { flex:1; display:flex; flex-direction:column; justify-content:center; gap:1.4mm; min-width:0; }
 
-    /* Bottom: contacts + QR */
-    .card-bottom {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 3mm;
-      min-height: 0;
-    }
-
-    /* Contacts */
-    .contacts {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 1.4mm;
-      min-width: 0;
-    }
     .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 2mm;
-      padding: 0.9mm 1.5mm;
-      border-radius: 1mm;
-      background: rgba(255,255,255,0.05);
-      border-left: 0.8mm solid #cc0000;
+      display:flex; align-items:center; gap:2mm; padding:0.9mm 1.5mm;
+      border-radius:1mm; background:rgba(255,255,255,0.05); border-left:0.8mm solid #cc0000;
     }
     .c-icon-wrap {
-      width: 5mm;
-      height: 5mm;
-      border-radius: 50%;
-      background: #cc0000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 0 2mm rgba(204,0,0,0.5);
+      width:5mm; height:5mm; border-radius:50%; background:#cc0000;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      box-shadow:0 0 2mm rgba(204,0,0,0.5);
     }
-    .c-icon {
-      width: 2.8mm;
-      height: 2.8mm;
-      display: block;
-      flex-shrink: 0;
-    }
-    .c-text {
-      font-size: 2.3mm;
-      font-weight: 500;
-      color: #ffffff;
-      line-height: 1;
-      white-space: nowrap;
-      overflow: visible;
-    }
-    .c-text.web { color: #ffffff; font-weight: 600; }
+    .c-icon { width:2.8mm; height:2.8mm; display:block; flex-shrink:0; }
+    .c-text { font-size:2.3mm; font-weight:500; color:#fff; line-height:1; white-space:nowrap; overflow:visible; }
+    .c-text.web { color:#fff; font-weight:600; }
 
-    /* QR */
-    .qr-area {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5mm;
-    }
+    .qr-area { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:1.5mm; }
     .qr-border {
-      padding: 0.6mm;
-      border-radius: 2.5mm;
-      background: linear-gradient(135deg, #ff4444 0%, #cc0000 50%, #660000 100%);
-      box-shadow: 0 0 5mm rgba(204,0,0,0.4);
-      line-height: 0;
-      flex-shrink: 0;
+      padding:0.6mm; border-radius:2.5mm; line-height:0; flex-shrink:0;
+      background:linear-gradient(135deg,#ff4444 0%,#cc0000 50%,#660000 100%);
+      box-shadow:0 0 5mm rgba(204,0,0,0.4);
     }
-    .qr-wrap {
-      background: #ffffff;
-      padding: 1.5mm;
-      border-radius: 2mm;
-      line-height: 0;
-    }
-    .qr-wrap canvas,
-    .qr-wrap img {
-      width: 22mm !important;
-      height: 22mm !important;
-      display: block;
-    }
-    .qr-label {
-      font-size: 1.8mm;
-      color: #888;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-weight: 600;
-    }
+    .qr-wrap { background:#fff; padding:1.5mm; border-radius:2mm; line-height:0; }
+    .qr-wrap canvas, .qr-wrap img { width:22mm !important; height:22mm !important; display:block; }
+    .qr-label { font-size:1.8mm; color:#888; text-align:center; text-transform:uppercase; letter-spacing:0.12em; font-weight:600; }
 
-    /* ── Print ── */
+    /* ══════════════════════════════════════
+       LIGHT CARD OVERRIDES
+    ══════════════════════════════════════ */
+    .card.light { background: #f4f4f4; }
+    .card.light .brand-text .name { color: #111; }
+    .card.light .brand-text .sub  { color: #cc0000; }
+    .card.light .emp-name          { color: rgba(0,0,0,0.45); }
+    .card.light .c-text            { color: #1a1a1a; }
+    .card.light .c-text.web        { color: #cc0000; }
+    .card.light .contact-item      { background: rgba(0,0,0,0.04); border-left-color: #cc0000; }
+    .card.light .c-icon-wrap       { background: #cc0000; }
+    .card.light .qr-label          { color: #777; }
+    .card.light .divider           { background: linear-gradient(90deg,#cc0000 65%,transparent); }
+    .card.light .c-text.web        { color: #cc0000 !important; }
+    .card.light .brand-text .name  { color: #111 !important; }
+    .card.light .brand-text .sub   { color: #cc0000 !important; }
+
+    /* ══════════════════════════════════════
+       FORCE BACKGROUND PRINTING
+    ══════════════════════════════════════ */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+
+    /* ══════════════════════════════════════
+       PRINT
+    ══════════════════════════════════════ */
     @media print {
-      body  { background: none; padding: 0; }
-      .ui   { display: none; }
-      .sheet { margin: 0; }
+      body  { background:none !important; padding:0; }
+      .ui   { display:none; }
+      .sheet { margin:0; }
     }
     @page { size: A4; margin: 0; }
   </style>
 </head>
 <body>
 
+<!-- ══════════════════════════════════════
+     UI PANEL
+══════════════════════════════════════ -->
 <div class="ui">
 
   <div class="ui-header">
@@ -314,51 +239,154 @@
       <path d="M24,2 A22,22 0 0,1 24,46 Z" fill="#2b2b2b"/>
       <path d="M27,7 L14,27 H22 L18,42 L35,22 H27 Z" fill="white"/>
     </svg>
-    <div class="ui-brand">
-      <div class="ui-sub">Elektro</div>
-      <div class="ui-name">Novateh</div>
-    </div>
+    <div><div class="ui-sub">Elektro</div><div class="ui-name">Novateh</div></div>
   </div>
 
-  <div class="ui-divider"></div>
-  <p class="ui-tagline">Generator vizitk · 10 kartic na A4</p>
+  <div class="ui-hr"></div>
 
-  <div class="tip">
-    <strong>Telefon ne doseže localhost?</strong><br>
-    Odpri <strong>PowerShell</strong> → vpiši <code>ipconfig</code> → poišči <strong>IPv4 Address</strong>
-    (npr. <code>192.168.1.105</code>) → zamenjaj URL spodaj z <code>http://192.168.1.105:4000</code>
+  <!-- QR vsebina -->
+  <div class="sec-label">Vsebina QR kode</div>
+  <div class="chip-group">
+    <div class="chip active" data-mode="web"  onclick="setMode('web')">🌐 Spletna stran</div>
+    <div class="chip"        data-mode="call" onclick="setMode('call')">📞 Klic</div>
+    <div class="chip"        data-mode="email"onclick="setMode('email')">✉ Email</div>
   </div>
 
-  <div class="url-section">
-    <div class="url-label">URL spletne strani za QR kodo</div>
-    <div class="url-row">
-      <input type="text" id="urlInput" value="http://localhost:4000" placeholder="http://192.168.x.x:4000" />
+  <!-- URL input (samo za web) -->
+  <div class="field" id="urlField">
+    <div class="sec-label">URL spletne strani</div>
+    <div class="tip">
+      <strong>Bela stran pri skeniranju?</strong> Strežnik mora poslušati na <code>0.0.0.0</code>, ne samo <code>localhost</code>.<br>
+      Klikni <strong>📡 Najdi IP</strong> — prikazali se bodo vsi omrežni IP-ji, izberi WiFi naslov.
     </div>
-    <div class="btn-row">
-      <button class="btn btn-red"  onclick="regenerate()">⟳ Posodobi QR</button>
-      <button class="btn btn-dark" onclick="window.print()">🖨 Natisni A4</button>
+    <div class="field-row">
+      <input type="text" id="urlInput" value="http://192.168.64.100:4000" placeholder="http://192.168.x.x:4000"
+             oninput="S.url=this.value"/>
+      <button class="btn btn-dark" onclick="autoIP(this)" title="Poišči vse lokalne IP-je">📡 Najdi IP</button>
     </div>
+    <div class="ip-list" id="ipList" style="display:none"></div>
+  </div>
+
+  <!-- Ime zaposlenega -->
+  <div class="field">
+    <div class="sec-label">Ime zaposlenega (neobvezno)</div>
+    <input type="text" id="empInput" placeholder="npr. Robert Arnuš" oninput="S.employee=this.value"/>
+  </div>
+
+  <!-- Tema -->
+  <div class="sec-label">Tema kartic</div>
+  <div class="chip-group">
+    <div class="chip active" data-theme="dark"  onclick="setTheme('dark')">◼ Temna</div>
+    <div class="chip"        data-theme="light" onclick="setTheme('light')">◻ Svetla (manj črnila)</div>
+  </div>
+
+  <!-- Možnosti -->
+  <label class="check-row">
+    <input type="checkbox" id="bleedCheck" onchange="S.bleed=this.checked; buildCards()"/>
+    <span>✂ Rezalne oznake + 3mm bleed (za tiskarno) — 8 kartic na A4</span>
+  </label>
+
+  <!-- Gumbi -->
+  <div class="btn-row">
+    <button class="btn btn-red"   onclick="buildCards()">⟳ Posodobi</button>
+    <button class="btn btn-dark"  onclick="window.print()">🖨 Natisni</button>
+    <button class="btn btn-green" onclick="savePDF()"        id="pdfBtn">⬇ PDF</button>
+    <button class="btn btn-blue"  onclick="exportCard()"     id="cardBtn">🖼 Kartica PNG</button>
   </div>
 
 </div>
 
-<div class="sheet" id="sheet"></div>
+<div class="sheet normal" id="sheet"></div>
 
 <script>
-  // SVG icons (Material Design / clean geometric)
-  const ICON_PIN = `<svg viewBox="0 0 24 24" fill="#cc0000" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-  </svg>`;
+  /* ── State ── */
+  const S = { url:'http://192.168.64.100:4000', mode:'web', theme:'dark', employee:'', bleed:false };
 
-  const ICON_PHONE = `<svg viewBox="0 0 24 24" fill="#cc0000" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-  </svg>`;
+  /* ── QR content based on mode ── */
+  function qrContent() {
+    if (S.mode === 'call')  return 'tel:+38641394879';
+    if (S.mode === 'email') return 'mailto:elektro.novateh@gmail.com';
+    return S.url;
+  }
 
-  const ICON_MAIL = `<svg viewBox="0 0 24 24" fill="#cc0000" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-  </svg>`;
+  /* ── Mode / theme setters ── */
+  function setMode(m) {
+    S.mode = m;
+    document.querySelectorAll('.chip[data-mode]').forEach(c => c.classList.toggle('active', c.dataset.mode === m));
+    document.getElementById('urlField').style.display = m === 'web' ? '' : 'none';
+    buildCards();
+  }
+  function setTheme(t) {
+    S.theme = t;
+    document.querySelectorAll('.chip[data-theme]').forEach(c => c.classList.toggle('active', c.dataset.theme === t));
+    buildCards();
+  }
 
-  // Logo: left-half red, right-half dark grey, white bolt
+  /* ── Auto IP via WebRTC + STUN ── */
+  async function autoIP(btn) {
+    const origText = btn.textContent;
+    btn.textContent = '⏳ Iščem...'; btn.disabled = true;
+    const ipList = document.getElementById('ipList');
+    ipList.style.display = 'none'; ipList.innerHTML = '';
+
+    try {
+      const found = await new Promise((resolve) => {
+        const ips = new Set();
+        const pc = new RTCPeerConnection({
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+          ]
+        });
+        pc.createDataChannel('');
+        pc.createOffer().then(o => pc.setLocalDescription(o)).catch(() => {});
+        pc.onicecandidate = e => {
+          if (!e?.candidate) return;
+          for (const m of e.candidate.candidate.matchAll(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/g)) {
+            const ip = m[1];
+            if (!ip.startsWith('127.') && !ip.startsWith('169.254.')) ips.add(ip);
+          }
+        };
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === 'complete') { pc.close(); resolve([...ips]); }
+        };
+        setTimeout(() => { try { pc.close(); } catch{} resolve([...ips]); }, 5000);
+      });
+
+      if (!found.length) {
+        alert('Noben IP ni bil zaznan.\nRočno: PowerShell → ipconfig → IPv4 Address');
+      } else {
+        const port = document.getElementById('urlInput').value.match(/:(\d+)/)?.[1] || '4000';
+        ipList.style.display = 'flex';
+        found.forEach(ip => {
+          const chip = document.createElement('div');
+          chip.className = 'ip-chip';
+          chip.textContent = ip;
+          // WiFi/LAN IP-ji imajo prednost (vizualna oznaka)
+          if (ip.startsWith('192.168.') || ip.startsWith('10.')) {
+            chip.textContent = '★ ' + ip;
+            chip.style.borderColor = 'rgba(204,0,0,0.5)';
+          }
+          chip.onclick = () => {
+            document.querySelectorAll('.ip-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            const url = `http://${ip}:${port}`;
+            document.getElementById('urlInput').value = url;
+            S.url = url;
+            buildCards();
+          };
+          ipList.appendChild(chip);
+        });
+        // Avtomatsko izberi prvi WiFi IP
+        const wifiChip = [...ipList.querySelectorAll('.ip-chip')]
+          .find(c => c.textContent.startsWith('★'));
+        if (wifiChip) wifiChip.click();
+      }
+    } catch(e) { alert('Napaka: ' + e.message); }
+    btn.textContent = origText; btn.disabled = false;
+  }
+
+  /* ── Logo SVG ── */
   function logoSVG() {
     return `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
       <circle cx="24" cy="24" r="22" fill="#cc0000"/>
@@ -367,166 +395,270 @@
     </svg>`;
   }
 
-  const WEBSITE = 'www.elektro-novateh.si'; // ← zamenjaj z dejansko domeno
-
-  const QR_PX = 84;
-
-  // Generates perspective grid SVG lines (vanishing point at vpX, vpY)
-  function makeGrid(vpX, vpY, botY, cardW) {
-    const xPos = Array.from({length: 13}, (_, k) => Math.round(k * cardW / 12));
-    const tVals = [0.14, 0.27, 0.41, 0.56, 0.70, 0.84, 1.0];
-    const yPos  = tVals.map(t => Math.round(vpY + t * (botY - vpY)));
-
-    const vLines = xPos.map(x =>
-      `<line x1="${x}" y1="${botY}" x2="${vpX}" y2="${vpY}" stroke="#cc0000" stroke-width="0.9"/>`
-    ).join('');
-
-    const hLines = yPos.map(y => {
-      const t  = (y - vpY) / (botY - vpY);
-      const x1 = Math.round(vpX * (1 - t));
-      const x2 = Math.round(vpX + (cardW - vpX) * t);
-      return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#cc0000" stroke-width="0.7"/>`;
-    }).join('');
-
-    return `<g opacity="0.22">${vLines}${hLines}</g>`;
+  /* ── Dark card background SVG (electric arcs) ── */
+  function darkBG(i) {
+    return `<svg viewBox="0 0 850 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="sc${i}" cx="860" cy="-5" r="280" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="#ff3300" stop-opacity="0.55"/>
+          <stop offset="35%"  stop-color="#cc0000" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="ba${i}" cx="0" cy="540" r="240" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="#770000" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#770000" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="lv${i}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="black" stop-opacity="0.50"/>
+          <stop offset="45%"  stop-color="black" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="black" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="tv${i}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="black" stop-opacity="0.40"/>
+          <stop offset="32%"  stop-color="black" stop-opacity="0.08"/>
+          <stop offset="55%"  stop-color="black" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect width="850" height="540" fill="url(#sc${i})"/>
+      <rect width="850" height="540" fill="url(#ba${i})"/>
+      <!-- Main arc -->
+      <polyline points="860,-5 782,44 816,91 744,147 774,207 685,267 720,327 610,407 660,477 550,541"
+                stroke="#cc0000" stroke-width="16" stroke-linejoin="round" fill="none" opacity="0.06"/>
+      <polyline points="860,-5 782,44 816,91 744,147 774,207 685,267 720,327 610,407 660,477 550,541"
+                stroke="#ee1100" stroke-width="5"  stroke-linejoin="round" fill="none" opacity="0.12"/>
+      <polyline points="860,-5 782,44 816,91 744,147 774,207 685,267 720,327 610,407 660,477 550,541"
+                stroke="#ff2200" stroke-width="1.4" stroke-linejoin="miter"  fill="none" opacity="0.45"/>
+      <!-- Branch A -->
+      <polyline points="744,147 684,193 716,242 636,289"
+                stroke="#dd1100" stroke-width="6" stroke-linejoin="round" fill="none" opacity="0.05"/>
+      <polyline points="744,147 684,193 716,242 636,289"
+                stroke="#ff2200" stroke-width="1.0" stroke-linejoin="miter" fill="none" opacity="0.30"/>
+      <!-- Branch B -->
+      <polyline points="685,267 614,307 646,357 544,419"
+                stroke="#cc0000" stroke-width="5" stroke-linejoin="round" fill="none" opacity="0.05"/>
+      <polyline points="685,267 614,307 646,357 544,419"
+                stroke="#ff2200" stroke-width="0.9" stroke-linejoin="miter" fill="none" opacity="0.25"/>
+      <!-- Secondary arc -->
+      <polyline points="860,-5 824,52 860,107 792,163 830,217 752,277 790,337 702,400"
+                stroke="#cc0000" stroke-width="8" stroke-linejoin="round" fill="none" opacity="0.04"/>
+      <polyline points="860,-5 824,52 860,107 792,163 830,217 752,277 790,337 702,400"
+                stroke="#ff3300" stroke-width="0.9" stroke-linejoin="miter" fill="none" opacity="0.30"/>
+      <!-- Micro arcs -->
+      <polyline points="832,14 856,34 842,54"  stroke="#ff4400" stroke-width="0.8" fill="none" opacity="0.30"/>
+      <polyline points="802,8 822,27 810,44 828,60" stroke="#ff3300" stroke-width="0.6" fill="none" opacity="0.25"/>
+      <!-- Nodes -->
+      <circle cx="860" cy="-5"  r="32" fill="#ff3300" opacity="0.14"/>
+      <circle cx="860" cy="-5"  r="14" fill="#ff4400" opacity="0.30"/>
+      <circle cx="860" cy="-5"  r="5"  fill="#ff8844" opacity="0.70"/>
+      <circle cx="744" cy="147" r="18" fill="#dd1100" opacity="0.09"/>
+      <circle cx="744" cy="147" r="7"  fill="#ff2200" opacity="0.22"/>
+      <circle cx="744" cy="147" r="2.5" fill="#ff6633" opacity="0.60"/>
+      <circle cx="685" cy="267" r="14" fill="#cc0000" opacity="0.08"/>
+      <circle cx="685" cy="267" r="5"  fill="#ee2200" opacity="0.20"/>
+      <circle cx="685" cy="267" r="2"  fill="#ff4422" opacity="0.50"/>
+      <circle cx="610" cy="407" r="10" fill="#cc0000" opacity="0.07"/>
+      <circle cx="610" cy="407" r="4"  fill="#dd2200" opacity="0.16"/>
+      <circle cx="610" cy="407" r="1.5" fill="#ff3300" opacity="0.42"/>
+      <!-- Corner -->
+      <polygon points="670,0 850,0 850,165" fill="#cc0000" opacity="0.10"/>
+      <!-- Veils -->
+      <rect width="850" height="540" fill="url(#lv${i})"/>
+      <rect width="850" height="540" fill="url(#tv${i})"/>
+      <!-- Bolt watermark -->
+      <path d="M615,168 L492,362 H582 L540,508 H558 L744,268 H652 Z" fill="white" opacity="0.042"/>
+    </svg>`;
   }
 
-  function buildCards(url) {
+  /* ── Light card background SVG ── */
+  function lightBG(i) {
+    return `<svg viewBox="0 0 850 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="lg${i}" cx="100%" cy="0%" r="55%">
+          <stop offset="0%"   stop-color="#cc0000" stop-opacity="0.07"/>
+          <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="850" height="540" fill="url(#lg${i})"/>
+      <!-- Corner accent -->
+      <polygon points="680,0 850,0 850,145" fill="#cc0000" opacity="0.07"/>
+      <!-- Bottom red stripe -->
+      <rect x="0" y="522" width="850" height="18" fill="#cc0000" opacity="0.08"/>
+      <!-- Subtle bolt watermark -->
+      <path d="M615,168 L492,362 H582 L540,508 H558 L744,268 H652 Z" fill="#cc0000" opacity="0.04"/>
+    </svg>`;
+  }
+
+  /* ── Crop marks SVG ──
+     Kartica: 85×54mm.
+     Oznake tečejo čez celotno rezno linijo (cez celo).
+     Barva: bela za temno temo, črna za svetlo temo.
+     SVG se razteza 5mm izven kartice z overflow:visible.
+  ── */
+  function cropMarksSVG() {
+    const ext   = 5;     // mm razširitev SVG izven kartice
+    const cW    = 85, cH = 54;   // dimenzije kartice
+    const color = S.theme === 'dark' ? 'white' : '#111';
+    const svgW  = cW + ext*2;   // 95
+    const svgH  = cH + ext*2;   // 64
+
+    // Rezne linije tečejo čez celotno stranico kartice
+    // + 4mm navzven od roba (ext=5mm prostor je dovolj)
+    // Koordinate: kartica je od (ext,ext)=(5,5) do (90,59)
+    const x1=ext, y1=ext, x2=ext+cW, y2=ext+cH;
+    const out = 4;   // mm koliko sega oznaka navzven
+
+    const lines = [
+      // Zgornji rob – polna vodoravna linija + podaljšek navzgor
+      `<line x1="${x1-out}" y1="${y1}" x2="${x2+out}" y2="${y1}"/>`,
+      // Spodnji rob – polna vodoravna linija + podaljšek navzdol
+      `<line x1="${x1-out}" y1="${y2}" x2="${x2+out}" y2="${y2}"/>`,
+      // Levi rob – polna navpična linija + podaljšek levo
+      `<line x1="${x1}" y1="${y1-out}" x2="${x1}" y2="${y2+out}"/>`,
+      // Desni rob – polna navpična linija + podaljšek desno
+      `<line x1="${x2}" y1="${y1-out}" x2="${x2}" y2="${y2+out}"/>`,
+    ].join('');
+
+    return `<svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 ${svgW} ${svgH}"
+      style="position:absolute;top:-${ext}mm;left:-${ext}mm;width:${svgW}mm;height:${svgH}mm;pointer-events:none;z-index:20;overflow:visible;"
+    ><g stroke="${color}" stroke-width="0.35" stroke-dasharray="1.5 1" fill="none" opacity="0.8">${lines}</g></svg>`;
+  }
+
+  /* ── Build cards ── */
+  function buildCards() {
+    S.url = document.getElementById('urlInput').value.trim() || S.url;
+    S.employee = document.getElementById('empInput').value.trim();
+
     const sheet = document.getElementById('sheet');
     sheet.innerHTML = '';
+    sheet.className = 'sheet ' + (S.bleed ? 'bleed' : 'normal');
 
-    for (let i = 0; i < 10; i++) {
-      const card = document.createElement('div');
-      card.className = 'card';
+    const count = S.bleed ? 8 : 10;
+    const qr = qrContent();
 
-      card.innerHTML = `
-        <div class="card-bg">
-          <svg viewBox="0 0 850 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <!-- Glow at vanishing point (horizon) -->
-              <radialGradient id="vp${i}" cx="425" cy="182" r="260" gradientUnits="userSpaceOnUse">
-                <stop offset="0%"   stop-color="#cc0000" stop-opacity="0.32"/>
-                <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
-              </radialGradient>
-              <!-- Top-right corner glow -->
-              <radialGradient id="tr${i}" cx="850" cy="0" r="380" gradientUnits="userSpaceOnUse">
-                <stop offset="0%"   stop-color="#ee1100" stop-opacity="0.38"/>
-                <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
-              </radialGradient>
-              <!-- Bottom-left ambient -->
-              <radialGradient id="bl${i}" cx="0" cy="540" r="280" gradientUnits="userSpaceOnUse">
-                <stop offset="0%"   stop-color="#880000" stop-opacity="0.22"/>
-                <stop offset="100%" stop-color="#880000" stop-opacity="0"/>
-              </radialGradient>
-              <!-- Top-half dark veil (keeps brand text crisp) -->
-              <linearGradient id="tv${i}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stop-color="black" stop-opacity="0.42"/>
-                <stop offset="35%"  stop-color="black" stop-opacity="0.18"/>
-                <stop offset="55%"  stop-color="black" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
+    for (let i = 0; i < count; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'card-slot';
 
-            <!-- Ambient glows -->
-            <rect width="850" height="540" fill="url(#tr${i})"/>
-            <rect width="850" height="540" fill="url(#bl${i})"/>
+      const empHTML = S.employee
+        ? `<div class="emp-name">${S.employee}</div>`
+        : '';
 
-            <!-- ═══ PERSPECTIVE GRID ═══ (VP at 425,182) -->
-            ${makeGrid(425, 182, 540, 850)}
+      const bgSVG = S.theme === 'light' ? lightBG(i) : darkBG(i);
+      const iconColor = S.theme === 'light' ? '#cc0000' : 'white';
 
-            <!-- Horizon glow where grid lines converge -->
-            <rect width="850" height="540" fill="url(#vp${i})"/>
+      slot.innerHTML = `
+        ${S.bleed ? cropMarksSVG() : ''}
+        <div class="card ${S.theme === 'light' ? 'light' : ''}">
+          <div class="card-bg">${bgSVG}</div>
+          <div class="card-bar"></div>
+          <div class="card-inner">
 
-            <!-- Bright horizon line -->
-            <line x1="0" y1="182" x2="850" y2="182"
-                  stroke="#cc0000" stroke-width="1.2" opacity="0.35"/>
-
-            <!-- Top-right corner filled accent -->
-            <polygon points="660,0 850,0 850,175" fill="#cc0000" opacity="0.13"/>
-
-            <!-- Small electric bolts top-right -->
-            <g fill="#ff2200">
-              <path d="M746,18 L734,42 H744 L730,66 L754,40 H743 Z" opacity="0.30"/>
-              <path d="M805,54 L796,72 H803 L793,90 L811,69 H803 Z" opacity="0.20"/>
-            </g>
-
-            <!-- Dark veil over top half → brand stays readable -->
-            <rect width="850" height="540" fill="url(#tv${i})"/>
-
-            <!-- Bolt watermark -->
-            <path d="M612,165 L488,365 H580 L538,510 H556 L742,268 H650 Z"
-                  fill="white" opacity="0.055"/>
-          </svg>
-        </div>
-        <div class="card-bar"></div>
-        <div class="card-inner">
-
-          <div class="brand-row">
-            <div class="logo-wrap">${logoSVG()}</div>
-            <div class="brand-text">
-              <div class="sub">Elektro</div>
-              <div class="name">Novateh</div>
+            <div class="brand-row">
+              <div class="logo-wrap">${logoSVG()}</div>
+              <div class="brand-text">
+                <div class="sub">Elektro</div>
+                <div class="name">Novateh</div>
+                ${empHTML}
+              </div>
             </div>
+
+            <div class="divider"></div>
+
+            <div class="card-bottom">
+              <div class="contacts">
+                <div class="contact-item">
+                  <div class="c-icon-wrap">
+                    <svg class="c-icon" viewBox="0 0 24 24" fill="${iconColor}"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                  </div>
+                  <span class="c-text">Destrnik 49B, 2253 Destrnik</span>
+                </div>
+                <div class="contact-item">
+                  <div class="c-icon-wrap">
+                    <svg class="c-icon" viewBox="0 0 24 24" fill="${iconColor}"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                  </div>
+                  <span class="c-text">041 394 879</span>
+                </div>
+                <div class="contact-item">
+                  <div class="c-icon-wrap">
+                    <svg class="c-icon" viewBox="0 0 24 24" fill="${iconColor}"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                  </div>
+                  <span class="c-text">elektro.novateh@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                  <div class="c-icon-wrap">
+                    <svg class="c-icon" viewBox="0 0 24 24" fill="${iconColor}"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                  </div>
+                  <span class="c-text web">${WEBSITE}</span>
+                </div>
+              </div>
+
+              <div class="qr-area">
+                <div class="qr-border">
+                  <div class="qr-wrap" id="qr-${i}"></div>
+                </div>
+                <div class="qr-label">Skeniraj</div>
+              </div>
+            </div>
+
           </div>
-
-          <div class="divider"></div>
-
-          <div class="card-bottom">
-            <div class="contacts">
-              <div class="contact-item">
-                <div class="c-icon-wrap">
-                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                </div>
-                <span class="c-text">Destrnik 49B, 2253 Destrnik</span>
-              </div>
-              <div class="contact-item">
-                <div class="c-icon-wrap">
-                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                </div>
-                <span class="c-text">041 394 879</span>
-              </div>
-              <div class="contact-item">
-                <div class="c-icon-wrap">
-                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                </div>
-                <span class="c-text">elektro.novateh@gmail.com</span>
-              </div>
-              <div class="contact-item">
-                <div class="c-icon-wrap">
-                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                </div>
-                <span class="c-text web">${WEBSITE}</span>
-              </div>
-            </div>
-
-            <div class="qr-area">
-              <div class="qr-border">
-                <div class="qr-wrap" id="qr-${i}"></div>
-              </div>
-              <div class="qr-label">Skeniraj</div>
-            </div>
-          </div>
-
         </div>`;
 
-      sheet.appendChild(card);
+      sheet.appendChild(slot);
 
       new QRCode(document.getElementById(`qr-${i}`), {
-        text: url,
-        width: QR_PX,
-        height: QR_PX,
-        colorDark: '#0d0d0d',
+        text: qr, width: 84, height: 84,
+        colorDark: S.theme === 'light' ? '#111111' : '#0d0d0d',
         colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H,
+        correctLevel: QRCode.CorrectLevel.H
       });
     }
   }
 
-  function regenerate() {
-    const val = document.getElementById('urlInput').value.trim();
-    if (val) buildCards(val);
+  const WEBSITE = 'www.elektro-novateh.si';
+
+  /* ── PDF export ── */
+  async function savePDF() {
+    const btn = document.getElementById('pdfBtn');
+    const orig = btn.innerHTML; btn.innerHTML='⏳ Ustvarjam...'; btn.disabled=true;
+    try {
+      const sheet = document.getElementById('sheet');
+      const canvas = await html2canvas(sheet, {
+        scale: 3, useCORS: true, allowTaint: true,
+        backgroundColor: '#c6c6c6', logging: false,
+        width: sheet.scrollWidth, height: sheet.scrollHeight
+      });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+      const pxPerMm = canvas.width / 210;
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, Math.min(canvas.height/pxPerMm, 297));
+      pdf.save('elektro-novateh-izkaznice.pdf');
+    } catch(e) { alert('Napaka: ' + e.message); }
+    btn.innerHTML=orig; btn.disabled=false;
   }
 
-  buildCards('http://localhost:4000');
+  /* ── Single card PNG export ── */
+  async function exportCard() {
+    const btn = document.getElementById('cardBtn');
+    const orig = btn.innerHTML; btn.innerHTML='⏳ Izvažam...'; btn.disabled=true;
+    try {
+      const card = document.querySelector('.card');
+      const canvas = await html2canvas(card, {
+        scale: 4, useCORS: true, allowTaint: true,
+        backgroundColor: null, logging: false
+      });
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `elektro-novateh-kartica${S.employee ? '-' + S.employee.replace(/\s+/g,'-') : ''}.png`;
+      a.click();
+    } catch(e) { alert('Napaka: ' + e.message); }
+    btn.innerHTML=orig; btn.disabled=false;
+  }
+
+  /* ── Init ── */
+  buildCards();
 </script>
 </body>
 </html>
