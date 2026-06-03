@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elektro Novateh – QR Koda</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #330000 0%, #1a0a0a 60%);
+      color: #f5e7e1;
+      font-family: Inter, 'Segoe UI', Arial, sans-serif;
+      padding: 24px 16px;
+    }
+
+    .card {
+      width: min(100%, 480px);
+      padding: 40px 32px 36px;
+      border: 1px solid rgba(204, 0, 0, 0.4);
+      border-radius: 24px;
+      background: rgba(12, 4, 4, 0.95);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 26px;
+    }
+
+    /* ── Brand ── */
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bolt {
+      font-size: 2.8rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 10px #cc0000);
+    }
+
+    .brand-name {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #ff3333;
+      text-shadow: 0 0 14px rgba(204, 0, 0, 0.55);
+    }
+
+    .brand-tagline {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #996060;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 56px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #cc0000, transparent);
+      border-radius: 2px;
+    }
+
+    /* ── QR wrapper ── */
+    .qr-frame {
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(204,0,0,0.09), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+    }
+
+    #qrcode {
+      background: #ffffff;
+      padding: 14px;
+      border-radius: 12px;
+      line-height: 0;
+    }
+
+    #qrcode canvas,
+    #qrcode img {
+      display: block;
+      width: 300px !important;
+      height: 300px !important;
+    }
+
+    /* ── Caption ── */
+    .caption {
+      font-size: 1rem;
+      color: #ddc8c4;
+      line-height: 1.6;
+      max-width: 88%;
+    }
+
+    /* ── Button ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 14px 36px;
+      min-width: 210px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #cc0000 0%, #8f0000 100%);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(204, 0, 0, 0.35);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(204, 0, 0, 0.5);
+      outline: none;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 400px) {
+      .card { padding: 30px 20px 28px; gap: 22px; }
+      .brand-name { font-size: 1.3rem; }
+      #qrcode canvas,
+      #qrcode img { width: 260px !important; height: 260px !important; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="brand">
+      <span class="bolt" aria-hidden="true">⚡</span>
+      <span class="brand-name">Elektro Novateh</span>
+      <span class="brand-tagline">elektroinštalacije</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="qr-frame">
+      <div id="qrcode"></div>
+    </div>
+
+    <p class="caption">Skeniraj za ogled naše spletne strani</p>
+
+    <button class="btn" id="downloadBtn" type="button">
+      ⬇ Prenesi QR kodo
+    </button>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const TARGET_URL = "http://localhost:4000";
+
+    const qr = new QRCode(document.getElementById("qrcode"), {
+      text: TARGET_URL,
+      width: 300,
+      height: 300,
+      colorDark: "#1a0a0a",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", function () {
+      const canvas = document.querySelector("#qrcode canvas");
+      const img    = document.querySelector("#qrcode img");
+
+      let dataUrl;
+
+      if (canvas) {
+        // Add a white border so the QR is cleanly framed when saved
+        const pad = 20;
+        const out = document.createElement("canvas");
+        out.width  = canvas.width  + pad * 2;
+        out.height = canvas.height + pad * 2;
+        const ctx  = out.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, out.width, out.height);
+        ctx.drawImage(canvas, pad, pad);
+        dataUrl = out.toDataURL("image/png");
+      } else if (img) {
+        dataUrl = img.src;
+      } else {
+        alert("QR kode ni bilo mogoče prenesti. Poskusite znova.");
+        return;
+      }
+
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "elektro-novateh-qr.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elektro Novateh – Izkaznice</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background:
+        radial-gradient(ellipse at 60% 0%, #1e0606 0%, #080808 55%),
+        #060606;
+      color: #f0f0f0;
+      font-family: Inter, 'Segoe UI', Arial, sans-serif;
+      padding: 36px 16px 52px;
+    }
+
+    /* ── Screen UI ── */
+    .ui {
+      max-width: 520px;
+      margin: 0 auto 40px;
+      background:
+        linear-gradient(155deg, #1d0909 0%, #0d0d0d 100%) padding-box,
+        linear-gradient(135deg, #ff4444 0%, #cc0000 45%, #660000 100%) border-box;
+      border: 1px solid transparent;
+      border-radius: 20px;
+      padding: 30px 28px 26px;
+      box-shadow:
+        0 28px 80px rgba(0,0,0,0.65),
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 0 40px rgba(180,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .ui-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .ui-logo { width: 52px; height: 52px; flex-shrink: 0; }
+    .ui-brand { text-align: left; }
+    .ui-brand .ui-name { font-size: 1.35rem; font-weight: 800; color: #fff; letter-spacing: 0.01em; line-height: 1.1; }
+    .ui-brand .ui-sub  { font-size: 0.7rem; font-weight: 700; color: #cc0000; letter-spacing: 0.2em; text-transform: uppercase; }
+
+    .ui-divider {
+      width: 85%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(204,0,0,0.35), transparent);
+    }
+
+    .ui-tagline {
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .tip {
+      background: rgba(180,0,0,0.06);
+      border: 1px solid rgba(204,0,0,0.16);
+      border-left: 3px solid #cc0000;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.81rem;
+      color: #aa7070;
+      width: 100%;
+      text-align: left;
+      line-height: 1.75;
+    }
+    .tip strong { color: #ff5555; }
+    .tip code {
+      background: rgba(255,255,255,0.07);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.84em;
+      color: #ffaaaa;
+    }
+
+    .url-section { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .url-label { font-size: 0.73rem; color: #555; letter-spacing: 0.1em; text-transform: uppercase; text-align: left; }
+    .url-row { display: flex; gap: 8px; width: 100%; }
+    .url-row input {
+      flex: 1;
+      padding: 11px 14px;
+      border: 1px solid rgba(204,0,0,0.2);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.45);
+      color: #f0f0f0;
+      font-size: 0.88rem;
+      font-family: monospace;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .url-row input:focus {
+      outline: none;
+      border-color: #cc0000;
+      box-shadow: 0 0 0 3px rgba(204,0,0,0.14);
+    }
+    .btn-row { display: flex; gap: 8px; width: 100%; }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-red {
+      background: linear-gradient(135deg, #e00000 0%, #8f0000 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(204,0,0,0.35);
+    }
+    .btn-red:hover { box-shadow: 0 6px 28px rgba(204,0,0,0.55); transform: translateY(-1px); }
+    .btn-dark { background: #161616; color: #bbb; border: 1px solid #2e2e2e; }
+    .btn-dark:hover { background: #1e1e1e; }
+
+    /* ── A4 sheet: 2 × 5 = 10 cards, 85×54mm ── */
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #c6c6c6;
+      padding: 7mm 17mm;
+      display: grid;
+      grid-template-columns: repeat(2, 85mm);
+      grid-template-rows: repeat(5, 54mm);
+      gap: 3mm;
+      justify-content: center;
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 85mm;
+      height: 54mm;
+      border-radius: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      position: relative;
+      background: linear-gradient(145deg, #240b0b 0%, #100808 38%, #060606 100%);
+    }
+
+    /* Full-card SVG background layer */
+    .card-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .card-bg svg { width: 100%; height: 100%; }
+
+    /* Left red gradient bar */
+    .card-bar {
+      width: 3mm;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #ff4444 0%, #cc0000 50%, #8f0000 100%);
+      position: relative; z-index: 1;
+    }
+
+    /* Inner content */
+    .card-inner {
+      flex: 1;
+      padding: 3mm 3.5mm 3mm 3.5mm;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      position: relative; z-index: 1;
+    }
+
+    /* Brand row */
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+      flex-shrink: 0;
+    }
+    .logo-wrap { width: 12mm; height: 12mm; flex-shrink: 0; }
+    .brand-text .name {
+      font-size: 5.1mm; font-weight: 800;
+      color: #ffffff; letter-spacing: 0.01em; line-height: 1.1;
+    }
+    .brand-text .sub {
+      font-size: 3.2mm; font-weight: 700;
+      color: #cc0000; letter-spacing: 0.15em; text-transform: uppercase; line-height: 1.2;
+    }
+
+    /* Divider */
+    .divider {
+      height: 0.4mm;
+      background: linear-gradient(90deg, #cc0000 65%, transparent);
+      border-radius: 1mm;
+      margin: 2mm 0 2mm;
+      flex-shrink: 0;
+    }
+
+    /* Bottom: contacts + QR */
+    .card-bottom {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 3mm;
+      min-height: 0;
+    }
+
+    /* Contacts */
+    .contacts {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.4mm;
+      min-width: 0;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 2mm;
+      padding: 0.9mm 1.5mm;
+      border-radius: 1mm;
+      background: rgba(255,255,255,0.05);
+      border-left: 0.8mm solid #cc0000;
+    }
+    .c-icon-wrap {
+      width: 5mm;
+      height: 5mm;
+      border-radius: 50%;
+      background: #cc0000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 2mm rgba(204,0,0,0.5);
+    }
+    .c-icon {
+      width: 2.8mm;
+      height: 2.8mm;
+      display: block;
+      flex-shrink: 0;
+    }
+    .c-text {
+      font-size: 2.3mm;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: visible;
+    }
+    .c-text.web { color: #ffffff; font-weight: 600; }
+
+    /* QR */
+    .qr-area {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5mm;
+    }
+    .qr-border {
+      padding: 0.6mm;
+      border-radius: 2.5mm;
+      background: linear-gradient(135deg, #ff4444 0%, #cc0000 50%, #660000 100%);
+      box-shadow: 0 0 5mm rgba(204,0,0,0.4);
+      line-height: 0;
+      flex-shrink: 0;
+    }
+    .qr-wrap {
+      background: #ffffff;
+      padding: 1.5mm;
+      border-radius: 2mm;
+      line-height: 0;
+    }
+    .qr-wrap canvas,
+    .qr-wrap img {
+      width: 22mm !important;
+      height: 22mm !important;
+      display: block;
+    }
+    .qr-label {
+      font-size: 1.8mm;
+      color: #888;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body  { background: none; padding: 0; }
+      .ui   { display: none; }
+      .sheet { margin: 0; }
+    }
+    @page { size: A4; margin: 0; }
+  </style>
+</head>
+<body>
+
+<div class="ui">
+
+  <div class="ui-header">
+    <svg class="ui-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="22" fill="#cc0000"/>
+      <path d="M24,2 A22,22 0 0,1 24,46 Z" fill="#2b2b2b"/>
+      <path d="M27,7 L14,27 H22 L18,42 L35,22 H27 Z" fill="white"/>
+    </svg>
+    <div class="ui-brand">
+      <div class="ui-sub">Elektro</div>
+      <div class="ui-name">Novateh</div>
+    </div>
+  </div>
+
+  <div class="ui-divider"></div>
+  <p class="ui-tagline">Generator vizitk · 10 kartic na A4</p>
+
+  <div class="tip">
+    <strong>Telefon ne doseže localhost?</strong><br>
+    Odpri <strong>PowerShell</strong> → vpiši <code>ipconfig</code> → poišči <strong>IPv4 Address</strong>
+    (npr. <code>192.168.1.105</code>) → zamenjaj URL spodaj z <code>http://192.168.1.105:4000</code>
+  </div>
+
+  <div class="url-section">
+    <div class="url-label">URL spletne strani za QR kodo</div>
+    <div class="url-row">
+      <input type="text" id="urlInput" value="http://localhost:4000" placeholder="http://192.168.x.x:4000" />
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-red"  onclick="regenerate()">⟳ Posodobi QR</button>
+      <button class="btn btn-dark" onclick="window.print()">🖨 Natisni A4</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="sheet" id="sheet"></div>
+
+<script>
+  // SVG icons (Material Design / clean geometric)
+  const ICON_PIN = `<svg viewBox="0 0 24 24" fill="#cc0000" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+  </svg>`;
+
+  const ICON_PHONE = `<svg viewBox="0 0 24 24" fill="#cc0000" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+  </svg>`;
+
+  const ICON_MAIL = `<svg viewBox="0 0 24 24" fill="#cc0000" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+  </svg>`;
+
+  // Logo: left-half red, right-half dark grey, white bolt
+  function logoSVG() {
+    return `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <circle cx="24" cy="24" r="22" fill="#cc0000"/>
+      <path d="M24,2 A22,22 0 0,1 24,46 Z" fill="#2b2b2b"/>
+      <path d="M27,7 L14,27 H22 L18,42 L35,22 H27 Z" fill="white"/>
+    </svg>`;
+  }
+
+  const WEBSITE = 'www.elektro-novateh.si'; // ← zamenjaj z dejansko domeno
+
+  const QR_PX = 84;
+
+  // Generates perspective grid SVG lines (vanishing point at vpX, vpY)
+  function makeGrid(vpX, vpY, botY, cardW) {
+    const xPos = Array.from({length: 13}, (_, k) => Math.round(k * cardW / 12));
+    const tVals = [0.14, 0.27, 0.41, 0.56, 0.70, 0.84, 1.0];
+    const yPos  = tVals.map(t => Math.round(vpY + t * (botY - vpY)));
+
+    const vLines = xPos.map(x =>
+      `<line x1="${x}" y1="${botY}" x2="${vpX}" y2="${vpY}" stroke="#cc0000" stroke-width="0.9"/>`
+    ).join('');
+
+    const hLines = yPos.map(y => {
+      const t  = (y - vpY) / (botY - vpY);
+      const x1 = Math.round(vpX * (1 - t));
+      const x2 = Math.round(vpX + (cardW - vpX) * t);
+      return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#cc0000" stroke-width="0.7"/>`;
+    }).join('');
+
+    return `<g opacity="0.22">${vLines}${hLines}</g>`;
+  }
+
+  function buildCards(url) {
+    const sheet = document.getElementById('sheet');
+    sheet.innerHTML = '';
+
+    for (let i = 0; i < 10; i++) {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      card.innerHTML = `
+        <div class="card-bg">
+          <svg viewBox="0 0 850 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <!-- Glow at vanishing point (horizon) -->
+              <radialGradient id="vp${i}" cx="425" cy="182" r="260" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"   stop-color="#cc0000" stop-opacity="0.32"/>
+                <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Top-right corner glow -->
+              <radialGradient id="tr${i}" cx="850" cy="0" r="380" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"   stop-color="#ee1100" stop-opacity="0.38"/>
+                <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Bottom-left ambient -->
+              <radialGradient id="bl${i}" cx="0" cy="540" r="280" gradientUnits="userSpaceOnUse">
+                <stop offset="0%"   stop-color="#880000" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#880000" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Top-half dark veil (keeps brand text crisp) -->
+              <linearGradient id="tv${i}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="black" stop-opacity="0.42"/>
+                <stop offset="35%"  stop-color="black" stop-opacity="0.18"/>
+                <stop offset="55%"  stop-color="black" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Ambient glows -->
+            <rect width="850" height="540" fill="url(#tr${i})"/>
+            <rect width="850" height="540" fill="url(#bl${i})"/>
+
+            <!-- ═══ PERSPECTIVE GRID ═══ (VP at 425,182) -->
+            ${makeGrid(425, 182, 540, 850)}
+
+            <!-- Horizon glow where grid lines converge -->
+            <rect width="850" height="540" fill="url(#vp${i})"/>
+
+            <!-- Bright horizon line -->
+            <line x1="0" y1="182" x2="850" y2="182"
+                  stroke="#cc0000" stroke-width="1.2" opacity="0.35"/>
+
+            <!-- Top-right corner filled accent -->
+            <polygon points="660,0 850,0 850,175" fill="#cc0000" opacity="0.13"/>
+
+            <!-- Small electric bolts top-right -->
+            <g fill="#ff2200">
+              <path d="M746,18 L734,42 H744 L730,66 L754,40 H743 Z" opacity="0.30"/>
+              <path d="M805,54 L796,72 H803 L793,90 L811,69 H803 Z" opacity="0.20"/>
+            </g>
+
+            <!-- Dark veil over top half → brand stays readable -->
+            <rect width="850" height="540" fill="url(#tv${i})"/>
+
+            <!-- Bolt watermark -->
+            <path d="M612,165 L488,365 H580 L538,510 H556 L742,268 H650 Z"
+                  fill="white" opacity="0.055"/>
+          </svg>
+        </div>
+        <div class="card-bar"></div>
+        <div class="card-inner">
+
+          <div class="brand-row">
+            <div class="logo-wrap">${logoSVG()}</div>
+            <div class="brand-text">
+              <div class="sub">Elektro</div>
+              <div class="name">Novateh</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="card-bottom">
+            <div class="contacts">
+              <div class="contact-item">
+                <div class="c-icon-wrap">
+                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                </div>
+                <span class="c-text">Destrnik 49B, 2253 Destrnik</span>
+              </div>
+              <div class="contact-item">
+                <div class="c-icon-wrap">
+                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                </div>
+                <span class="c-text">041 394 879</span>
+              </div>
+              <div class="contact-item">
+                <div class="c-icon-wrap">
+                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </div>
+                <span class="c-text">elektro.novateh@gmail.com</span>
+              </div>
+              <div class="contact-item">
+                <div class="c-icon-wrap">
+                  <svg class="c-icon" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <span class="c-text web">${WEBSITE}</span>
+              </div>
+            </div>
+
+            <div class="qr-area">
+              <div class="qr-border">
+                <div class="qr-wrap" id="qr-${i}"></div>
+              </div>
+              <div class="qr-label">Skeniraj</div>
+            </div>
+          </div>
+
+        </div>`;
+
+      sheet.appendChild(card);
+
+      new QRCode(document.getElementById(`qr-${i}`), {
+        text: url,
+        width: QR_PX,
+        height: QR_PX,
+        colorDark: '#0d0d0d',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    }
+  }
+
+  function regenerate() {
+    const val = document.getElementById('urlInput').value.trim();
+    if (val) buildCards(val);
+  }
+
+  buildCards('http://localhost:4000');
+</script>
+</body>
+</html>
