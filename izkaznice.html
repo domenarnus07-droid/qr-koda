@@ -260,7 +260,7 @@
       Klikni <strong>📡 Najdi IP</strong> — prikazali se bodo vsi omrežni IP-ji, izberi WiFi naslov.
     </div>
     <div class="field-row">
-      <input type="text" id="urlInput" value="http://192.168.64.100:4000" placeholder="http://192.168.x.x:4000"
+      <input type="text" id="urlInput" value="https://rocky-charter-helmet.ngrok-free.dev" placeholder="http://192.168.x.x:4000"
              oninput="S.url=this.value"/>
       <button class="btn btn-dark" onclick="autoIP(this)" title="Poišči vse lokalne IP-je">📡 Najdi IP</button>
     </div>
@@ -300,7 +300,7 @@
 
 <script>
   /* ── State ── */
-  const S = { url:'http://192.168.64.100:4000', mode:'web', theme:'dark', employee:'', bleed:false };
+  const S = { url:'https://rocky-charter-helmet.ngrok-free.dev', mode:'web', theme:'dark', employee:'', bleed:false };
 
   /* ── QR content based on mode ── */
   function qrContent() {
