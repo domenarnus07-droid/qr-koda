@@ -161,8 +161,10 @@
     }
     .brand-row { display:flex; align-items:center; gap:2.5mm; flex-shrink:0; }
     .logo-wrap { width:12mm; height:12mm; flex-shrink:0; }
-    .brand-text .name { font-size:5.1mm; font-weight:800; color:#fff; letter-spacing:0.01em; line-height:1.1; }
+    .brand-text .name { font-size:5.1mm; font-weight:800; color:#fff; letter-spacing:0.01em; line-height:1.1; display:flex; align-items:baseline; gap:1.5mm; }
     .brand-text .sub  { font-size:3.2mm; font-weight:700; color:#cc0000; letter-spacing:0.15em; text-transform:uppercase; line-height:1.2; }
+    .brand-text .doo  { font-size:2.3mm; font-weight:600; color:rgba(255,255,255,0.5); letter-spacing:0.06em; }
+    .card.light .brand-text .doo { color:rgba(0,0,0,0.4); }
     .emp-name { font-size:2.7mm; font-weight:500; font-style:italic; color:rgba(255,255,255,0.6); margin-top:1mm; line-height:1; }
 
     .divider { height:0.4mm; background:linear-gradient(90deg,#cc0000 65%,transparent); border-radius:1mm; margin:2mm 0; flex-shrink:0; }
@@ -206,7 +208,7 @@
     .card.light .c-icon-wrap       { background: #cc0000; }
     .card.light .qr-label          { color: #777; }
     .card.light .divider           { background: linear-gradient(90deg,#cc0000 65%,transparent); }
-    .card.light .c-text.web        { color: #cc0000 !important; }
+    .card.light .c-text.web        { color: #1a1a1a !important; }
     .card.light .brand-text .name  { color: #111 !important; }
     .card.light .brand-text .sub   { color: #cc0000 !important; }
 
@@ -559,7 +561,7 @@
               <div class="logo-wrap">${logoSVG()}</div>
               <div class="brand-text">
                 <div class="sub">Elektro</div>
-                <div class="name">Novateh</div>
+                <div class="name">Novateh <span class="doo">d.o.o.</span></div>
                 ${empHTML}
               </div>
             </div>
