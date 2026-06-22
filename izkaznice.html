@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elektro Novateh – Izkaznice</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23dc2626'/%3E%3Cpath d='M18 4 9 18h6l-2 10 10-15h-6z' fill='%23fff'/%3E%3C/svg%3E" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -497,34 +498,27 @@
      SVG se razteza 5mm izven kartice z overflow:visible.
   ── */
   function cropMarksSVG() {
-    const ext   = 5;     // mm razširitev SVG izven kartice
-    const cW    = 85, cH = 54;   // dimenzije kartice
-    const color = S.theme === 'dark' ? 'white' : '#111';
-    const svgW  = cW + ext*2;   // 95
-    const svgH  = cH + ext*2;   // 64
+    const cW = 85, cH = 54;   // dimenzije kartice
+    const ins = 0.2;          // mm zamik navznoter da je črta vidna (ne odrezana)
 
-    // Rezne linije tečejo čez celotno stranico kartice
-    // + 4mm navzven od roba (ext=5mm prostor je dovolj)
-    // Koordinate: kartica je od (ext,ext)=(5,5) do (90,59)
-    const x1=ext, y1=ext, x2=ext+cW, y2=ext+cH;
-    const out = 4;   // mm koliko sega oznaka navzven
+    // Črtkane rezne linije po CELI stranici, točno ob robu kartice.
+    // SVG pokriva natanko kartico (brez negativnih odmikov / overflow),
+    // zato ga html2canvas pravilno izriše ob robu v PDF-ju.
+    const x1=ins, y1=ins, x2=cW-ins, y2=cH-ins;
+    const color = S.theme === 'dark' ? '#fff' : '#000';
 
     const lines = [
-      // Zgornji rob – polna vodoravna linija + podaljšek navzgor
-      `<line x1="${x1-out}" y1="${y1}" x2="${x2+out}" y2="${y1}"/>`,
-      // Spodnji rob – polna vodoravna linija + podaljšek navzdol
-      `<line x1="${x1-out}" y1="${y2}" x2="${x2+out}" y2="${y2}"/>`,
-      // Levi rob – polna navpična linija + podaljšek levo
-      `<line x1="${x1}" y1="${y1-out}" x2="${x1}" y2="${y2+out}"/>`,
-      // Desni rob – polna navpična linija + podaljšek desno
-      `<line x1="${x2}" y1="${y1-out}" x2="${x2}" y2="${y2+out}"/>`,
+      `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y1}"/>`,  // zgoraj
+      `<line x1="${x1}" y1="${y2}" x2="${x2}" y2="${y2}"/>`,  // spodaj
+      `<line x1="${x1}" y1="${y1}" x2="${x1}" y2="${y2}"/>`,  // levo
+      `<line x1="${x2}" y1="${y1}" x2="${x2}" y2="${y2}"/>`,  // desno
     ].join('');
 
     return `<svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 ${svgW} ${svgH}"
-      style="position:absolute;top:-${ext}mm;left:-${ext}mm;width:${svgW}mm;height:${svgH}mm;pointer-events:none;z-index:20;overflow:visible;"
-    ><g stroke="${color}" stroke-width="0.35" stroke-dasharray="1.5 1" fill="none" opacity="0.8">${lines}</g></svg>`;
+      viewBox="0 0 ${cW} ${cH}" preserveAspectRatio="none"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20;"
+    ><g stroke="${color}" stroke-width="0.3" stroke-dasharray="1.5 1" fill="none" opacity="0.85">${lines}</g></svg>`;
   }
 
   /* ── Build cards ── */
