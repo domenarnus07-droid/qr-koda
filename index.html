@@ -17,12 +17,25 @@
       padding: 24px;
       font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: #e2e8f0;
-      background:
-        radial-gradient(50rem 36rem at 15% -10%, rgba(59,130,246,0.18), transparent 60%),
-        radial-gradient(46rem 32rem at 100% 0%, rgba(251,146,60,0.12), transparent 55%),
-        #080d1e;
+      background: #080d1e;
+      overflow: hidden;
     }
-    .wrap { width: 100%; max-width: 720px; text-align: center; }
+    /* Animirano ozadje — lebdeči gradientni blobi (kot na ostalih straneh) */
+    .bg-blobs { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5;
+      animation: blob 14s ease-in-out infinite;
+    }
+    .blob.b1 { width: 30rem; height: 30rem; left: -8rem; top: -6rem; background: rgba(59,130,246,0.5); }
+    .blob.b2 { width: 28rem; height: 28rem; right: -6rem; top: 4rem; background: rgba(251,146,60,0.4); animation-delay: -4s; }
+    .blob.b3 { width: 26rem; height: 26rem; left: 30%; bottom: -10rem; background: rgba(96,165,250,0.4); animation-delay: -8s; }
+    @keyframes blob {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(40px,-50px) scale(1.1); }
+      66% { transform: translate(-30px,30px) scale(0.95); }
+    }
+    @media (prefers-reduced-motion: reduce) { .blob { animation: none; } }
+    .wrap { position: relative; z-index: 1; width: 100%; max-width: 720px; text-align: center; }
     .badge {
       display: inline-block; margin-bottom: 16px; padding: 6px 14px;
       border-radius: 999px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px;
@@ -48,6 +61,11 @@
   </style>
 </head>
 <body>
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
   <main class="wrap">
     <span class="badge">⚡ ELEKTRO NOVATEH</span>
     <h1><span>QR Orodja</span></h1>
