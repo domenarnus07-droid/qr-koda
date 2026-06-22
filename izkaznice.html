@@ -131,6 +131,18 @@
     /* Bleed: card size sama, slot ima +6mm prostor za oznake, overflow:hidden skrije del oznak */
     .sheet.bleed   { padding: 10mm 14mm; grid-template-columns: repeat(2,85mm); grid-auto-rows: 54mm; gap: 9mm; }
 
+    /* Predogled lista na manjših zaslonih: drsenje + pomanjšava (ne vpliva na PDF/tisk) */
+    .sheet-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    @media (max-width: 860px) {
+      .sheet-wrap { zoom: 0.62; }
+    }
+    @media (max-width: 560px) {
+      .sheet-wrap { zoom: 0.42; }
+    }
+    @media print {
+      .sheet-wrap { overflow: visible; zoom: 1; }
+    }
+
     /* ══════════════════════════════════════
        CARD SLOT (bleed wrapper)
     ══════════════════════════════════════ */
@@ -299,7 +311,7 @@
 
 </div>
 
-<div class="sheet normal" id="sheet"></div>
+<div class="sheet-wrap"><div class="sheet normal" id="sheet"></div></div>
 
 <script>
   /* ── State ── */
